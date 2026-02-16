@@ -7,9 +7,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f4f4f4'
   },
-  text: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: '#333'
+  logo: {
+    height: 34,
+    width: 134,
   }
 })
