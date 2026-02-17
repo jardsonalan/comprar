@@ -46,6 +46,33 @@ export function Home() {
     }
   }
 
+  async function handleRemove(id: string) {
+    try {
+      await itemsStorage.remove(id)
+      await itemsByStatus()
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Remover', 'Não foi possível remover o item.')
+    }
+  }
+
+  function handleClear() {
+    Alert.alert('Limpar', 'Tem certeza que deseja limpar a lista?', [
+      { text: 'Não', style: 'cancel' },
+      { text: 'Sim', onPress: () => onClear() }
+    ])
+  }
+
+  async function onClear() {
+    try {
+      await itemsStorage.clear()
+      setItems([])
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Limpar', 'Não foi possível limpar a lista.')
+    }
+  }
+
   // 1° Paramêtro: Função a ser executada
   // 2° Paramêtro: Array de dependências, ou seja, quando as dependências mudarem a função será executada novamente
   useEffect(() => {
@@ -76,7 +103,7 @@ export function Home() {
             />
           ))}
 
-          <TouchableOpacity style={styles.clearButton}>
+          <TouchableOpacity style={styles.clearButton} onPress={handleClear}>
             <Text style={styles.clearText}>Limpar</Text>
           </TouchableOpacity>
         </View>
@@ -87,7 +114,7 @@ export function Home() {
             <Item
               data={ item }
               onStatus={() => console.log('Status alterado')}
-              onRemove={() => console.log('Remover')}
+              onRemove={() => handleRemove(item.id)}
             />
           )}
           showsVerticalScrollIndicator={false}
