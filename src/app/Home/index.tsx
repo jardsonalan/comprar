@@ -73,6 +73,16 @@ export function Home() {
     }
   }
 
+  async function handleToggleItemStatus(id: string) {
+    try {
+      await itemsStorage.toggleStatus(id)
+      await itemsByStatus()
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Erro', 'Não foi possível atualizar o status.')
+    }
+  }
+
   // 1° Paramêtro: Função a ser executada
   // 2° Paramêtro: Array de dependências, ou seja, quando as dependências mudarem a função será executada novamente
   useEffect(() => {
@@ -113,7 +123,7 @@ export function Home() {
           renderItem={({ item }) => (
             <Item
               data={ item }
-              onStatus={() => console.log('Status alterado')}
+              onStatus={() => handleToggleItemStatus(item.id)}
               onRemove={() => handleRemove(item.id)}
             />
           )}
