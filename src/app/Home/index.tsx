@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { View, Image, TouchableOpacity, Text, FlatList, Alert } from 'react-native'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { Filter } from '@/components/Filter'
 import { FilterStatus } from '@/types/FilterStatus'
+import { itemsStorage, ItemStorage } from '@/storage/itemsStorage'
 import { styles } from './styles'
 import { Item } from '@/components/Item'
 
@@ -14,9 +15,9 @@ export function Home() {
   // 2° Posição: Função para atualizar o estado
   const [filter, setFilter] = useState<FilterStatus>(FilterStatus.PENDING)
   const [description, setDescription] = useState('')
-  const [items, setItems] = useState<any>([])
+  const [items, setItems] = useState<ItemStorage[]>([])
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!description.trim()) {
       return Alert.alert('Adicionar', 'Informe a descrição para adicionar.')
     }
@@ -26,7 +27,26 @@ export function Home() {
       description,
       status: FilterStatus.PENDING
     }
+
+    await itemsStorage.add(newItem)
+    await getItems()
   }
+
+  async function getItems() {
+    try {
+      const response = await itemsStorage.get()
+      setItems(response)
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Erro', 'Não foi possível carregar os itens.')
+    }
+  }
+
+  // 1° Paramêtro: Função a ser executada
+  // 2° Paramêtro: Array de dependências, ou seja, quando as dependências mudarem a função será executada novamente
+  useEffect(() => {
+    getItems()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -57,7 +77,7 @@ export function Home() {
         </View>
         <FlatList
           data={items}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Item
               data={ item }
